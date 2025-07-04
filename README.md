@@ -1,4 +1,4 @@
-# iOS App Template
+# Swift App Template For iOS
 
 ## Graphql
 
