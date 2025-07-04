@@ -1,0 +1,21 @@
+query GetMe {
+  me {
+    ...MeFragment
+  }
+}
+
+query GetUserList {
+  users {
+    ...UserFragment
+  }
+}
+
+fragment MeFragment on Me {
+  id
+  name
+}
+
+fragment UserFragment on User {
+  id
+  name
+}

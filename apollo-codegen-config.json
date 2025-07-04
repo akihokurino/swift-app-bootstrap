@@ -1,0 +1,36 @@
+{
+  "schemaNamespace": "API",
+  "input": {
+    "operationSearchPaths": ["**/*.graphql"],
+    "schemaSearchPaths": ["**/*.graphqls"]
+  },
+  "output": {
+    "testMocks": {
+      "none": {}
+    },
+    "schemaTypes": {
+      "path": "./Core/Sources/Feature/Infra/Graph/API",
+      "moduleType": {
+        "embeddedInTarget": {
+          "name": "App"
+        }
+      }
+    },
+    "operations": {
+      "inSchemaModule": {}
+    }
+  },
+  "schemaDownload": {
+    "downloadMethod": {
+      "introspection": {
+        "endpointURL": "https://sample.com/graphql",
+        "httpMethod": {
+          "POST": {}
+        },
+        "outputFormat": "SDL",
+        "includeDeprecatedInputValues": false
+      }
+    },
+    "outputPath": "./graphql/schema.graphqls"
+  }
+}
