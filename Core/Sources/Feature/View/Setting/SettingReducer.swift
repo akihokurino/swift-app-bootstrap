@@ -15,23 +15,21 @@ struct SettingReducer {
 
     @ObservableState
     struct State: Equatable {
+        @Presents var destination: Destination.State?
         var isInitialized = false
         var alert: AlertEntity?
         var isPresentedHUD = false
         var isPresentedAlert = false
 
         @Shared(.inMemory("sharedUserInfo")) var userInfo: UserInfo?
-
-        @Presents var destination: Destination.State?
     }
 
     enum Action {
+        case destination(PresentationAction<Destination.Action>)
         case initialize
         case setAlert(AlertEntity)
         case isPresentedHUD(Bool)
         case isPresentedAlert(Bool)
-
-        case destination(PresentationAction<Destination.Action>)
     }
 
     var body: some Reducer<State, Action> {
@@ -40,6 +38,14 @@ struct SettingReducer {
             // ----------------------------------------------------------------
             // common
             // ----------------------------------------------------------------
+            case .destination(let action):
+                guard let action = action.presented else {
+                    return .none
+                }
+                switch action {
+                default:
+                    return .none
+                }
             case .initialize:
                 guard !state.isInitialized else {
                     return .none
@@ -56,17 +62,6 @@ struct SettingReducer {
             case .isPresentedAlert(let val):
                 state.isPresentedAlert = val
                 return .none
-            // ----------------------------------------------------------------
-            // embed + destination
-            // ----------------------------------------------------------------
-            case .destination(let action):
-                guard let action = action.presented else {
-                    return .none
-                }
-                switch action {
-                default:
-                    return .none
-                }
             }
         }
         .ifLet(\.$destination, action: \.destination)

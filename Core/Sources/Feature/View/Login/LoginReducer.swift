@@ -1,17 +1,15 @@
 //
-//  DetailReducer.swift
+//  LoginReducer.swift
 //  Core
 //
-//  Created by akiho on 2025/07/04.
+//  Created by akiho on 2025/07/05.
 //
 
 import ComposableArchitecture
 import Foundation
 
 @Reducer
-struct DetailReducer {
-    @Dependency(\.dismiss) var dismiss
-
+struct LoginReducer {
     @Reducer
     enum Destination {}
 
@@ -23,7 +21,8 @@ struct DetailReducer {
         var isPresentedHUD = false
         var isPresentedAlert = false
 
-        @Shared(.inMemory("sharedUserInfo")) var userInfo: UserInfo?
+        var email: String = ""
+        var password: String = ""
     }
 
     enum Action {
@@ -33,7 +32,9 @@ struct DetailReducer {
         case isPresentedHUD(Bool)
         case isPresentedAlert(Bool)
 
-        case dismiss
+        case setEmail(String)
+        case setPassword(String)
+        case login
     }
 
     var body: some Reducer<State, Action> {
@@ -69,14 +70,18 @@ struct DetailReducer {
             // ----------------------------------------------------------------
             //
             // ----------------------------------------------------------------
-            case .dismiss:
-                return .run { _ in
-                    await dismiss()
-                }
+            case .setEmail(let val):
+                state.email = val
+                return .none
+            case .setPassword(let val):
+                state.password = val
+                return .none
+            case .login:
+                return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
     }
 }
 
-extension DetailReducer.Destination.State: Equatable {}
+extension LoginReducer.Destination.State: Equatable {}

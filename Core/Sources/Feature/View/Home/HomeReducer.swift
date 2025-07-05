@@ -19,6 +19,7 @@ struct HomeReducer {
 
     @ObservableState
     struct State: Equatable {
+        @Presents var destination: Destination.State?
         var isInitialized = false
         var alert: AlertEntity?
         var isPresentedHUD = false
@@ -28,11 +29,10 @@ struct HomeReducer {
         var users: WithCursor<User>?
         var isPresentedNextLoading = false
         var isPresentedPullToRefresh = false
-
-        @Presents var destination: Destination.State?
     }
 
     enum Action {
+        case destination(PresentationAction<Destination.Action>)
         case initialize
         case setAlert(AlertEntity)
         case isPresentedHUD(Bool)
@@ -42,8 +42,6 @@ struct HomeReducer {
         case presentDetailView
         case isPresentedNextLoading(Bool)
         case isPresentedPullToRefresh(Bool)
-
-        case destination(PresentationAction<Destination.Action>)
     }
 
     var body: some Reducer<State, Action> {
@@ -52,6 +50,17 @@ struct HomeReducer {
             // ----------------------------------------------------------------
             // common
             // ----------------------------------------------------------------
+            case .destination(let action):
+                guard let action = action.presented else {
+                    return .none
+                }
+                switch action {
+                case .detail(let action):
+                    switch action {
+                    default:
+                        return .none
+                    }
+                }
             case .initialize:
                 guard !state.isInitialized else {
                     return .none
@@ -79,7 +88,7 @@ struct HomeReducer {
                 state.isPresentedAlert = val
                 return .none
             // ----------------------------------------------------------------
-            // action
+            //
             // ----------------------------------------------------------------
             case .setUsers(let val):
                 state.users = val
@@ -93,20 +102,6 @@ struct HomeReducer {
             case .isPresentedPullToRefresh(let val):
                 state.isPresentedPullToRefresh = val
                 return .none
-            // ----------------------------------------------------------------
-            // embed + destination
-            // ----------------------------------------------------------------
-            case .destination(let action):
-                guard let action = action.presented else {
-                    return .none
-                }
-                switch action {
-                case .detail(let action):
-                    switch action {
-                    default:
-                        return .none
-                    }
-                }
             }
         }
         .ifLet(\.$destination, action: \.destination)

@@ -17,6 +17,7 @@ struct RootReducer {
 
     @ObservableState
     struct State: Equatable {
+        @Presents var destination: Destination.State?
         var isInitialized = false
         var alert: AlertEntity?
         var isPresentedHUD = false
@@ -24,13 +25,14 @@ struct RootReducer {
 
         @Shared(.inMemory("sharedUserInfo")) var userInfo: UserInfo?
         var tabSelection: Tab = .home
-
-        var home: HomeReducer.State? = HomeReducer.State()
-        var setting: SettingReducer.State? = SettingReducer.State()
-        @Presents var destination: Destination.State?
+        var appMode: AppMode = .loading
+        var login: LoginReducer.State?
+        var home: HomeReducer.State?
+        var setting: SettingReducer.State?
     }
 
     enum Action {
+        case destination(PresentationAction<Destination.Action>)
         case initialize
         case setAlert(AlertEntity)
         case isPresentedHUD(Bool)
@@ -38,10 +40,9 @@ struct RootReducer {
 
         case setMe(Me)
         case setTabSelection(Tab)
-
+        case login(LoginReducer.Action)
         case home(HomeReducer.Action)
         case setting(SettingReducer.Action)
-        case destination(PresentationAction<Destination.Action>)
     }
 
     var body: some Reducer<State, Action> {
@@ -50,22 +51,22 @@ struct RootReducer {
             // ----------------------------------------------------------------
             // common
             // ----------------------------------------------------------------
+            case .destination(let action):
+                guard let action = action.presented else {
+                    return .none
+                }
+                switch action {
+                default:
+                    return .none
+                }
             case .initialize:
                 guard !state.isInitialized else {
                     return .none
                 }
                 state.isInitialized = true
-                state.isPresentedHUD = true
-
-                return .run { send in
-                    do {
-                        let me = try (await gqlClient.query(API.GetMeQuery())).me.fragments.meFragment
-                        await send(.setMe(me))
-                    } catch {
-                        await send(.setAlert(AlertEntity.from(error: error)))
-                    }
-                    await send(.isPresentedHUD(false))
-                }
+                state.appMode = .login
+                state.login = LoginReducer.State()
+                return .none
             case .setAlert(let entity):
                 state.alert = entity
                 state.isPresentedAlert = true
@@ -77,7 +78,7 @@ struct RootReducer {
                 state.isPresentedAlert = val
                 return .none
             // ----------------------------------------------------------------
-            // action
+            //
             // ----------------------------------------------------------------
             case .setMe(let val):
                 state.$userInfo.withLock {
@@ -87,9 +88,25 @@ struct RootReducer {
             case .setTabSelection(let val):
                 state.tabSelection = val
                 return .none
-            // ----------------------------------------------------------------
-            // embed + destination
-            // ----------------------------------------------------------------
+            case .login(let action):
+                switch action {
+                case .login:
+                    state.login = nil
+                    state.home = HomeReducer.State()
+                    state.setting = SettingReducer.State()
+                    state.appMode = .running
+                    return .run { send in
+                        do {
+                            let me = try (await gqlClient.query(API.GetMeQuery())).me.fragments.meFragment
+                            await send(.setMe(me))
+                        } catch {
+                            await send(.setAlert(AlertEntity.from(error: error)))
+                        }
+                        await send(.isPresentedHUD(false))
+                    }
+                default:
+                    return .none
+                }
             case .home(let action):
                 switch action {
                 default:
@@ -100,15 +117,10 @@ struct RootReducer {
                 default:
                     return .none
                 }
-            case .destination(let action):
-                guard let action = action.presented else {
-                    return .none
-                }
-                switch action {
-                default:
-                    return .none
-                }
             }
+        }
+        .ifLet(\.login, action: \.login) {
+            LoginReducer()
         }
         .ifLet(\.home, action: \.home) {
             HomeReducer()
@@ -126,5 +138,11 @@ extension RootReducer {
     enum Tab: Equatable {
         case home
         case setting
+    }
+
+    enum AppMode: Equatable {
+        case loading
+        case login
+        case running
     }
 }
