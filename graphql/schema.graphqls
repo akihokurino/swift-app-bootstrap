@@ -35,24 +35,183 @@ directive @defer(
   label: String
 ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
+enum AcademicBackground {
+  VOCATIONAL_SCHOOL
+  HIGH_SCHOOL
+  UNIVERSITY
+  GRADUATE_SCHOOL
+  OTHER
+}
+
+type AcademicBackgroundValue {
+  value: AcademicBackground!
+  label: String!
+}
+
+enum AnnualIncome {
+  UNSET
+  LESS_THAN_200
+  LESS_THAN_400
+  LESS_THAN_600
+  LESS_THAN_800
+  LESS_THAN_1000
+  LESS_THAN_1200
+}
+
+type AnnualIncomeValue {
+  value: AnnualIncome!
+  label: String!
+}
+
+scalar AppstoreJwsTransaction
+
+input AppstoreSubscriptionTransactionSyncInput {
+  transactions: [AppstoreJwsTransaction!]!
+}
+
+enum BodyShape {
+  SLIM
+  SLIMMER
+  NORMAL
+  GLAMOROUS
+  MUSCULAR
+  CHUBBY
+  POUCHY
+}
+
+type BodyShapeValue {
+  value: BodyShape!
+  label: String!
+}
+
 type BoolPayload {
   isOk: Boolean!
 }
 
-scalar DateTime
-
-type Me {
-  id: ID!
-  name: String!
+type ChatRoom {
+  user1: User!
+  user2: User!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
+scalar Date
+
+scalar DateTime
+
+type Ekyc {
+  documentUrl: String!
+  rejectedReason: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input FootprintUserInput {
+  userId: ID!
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+type GenderValue {
+  value: Gender!
+  label: String!
+}
+
+type Hobby {
+  id: ID!
+  name: String!
+  iconUrl: String!
+}
+
+enum Holiday {
+  WEEKEND
+  WEEKDAY
+  IRREGULAR
+  OTHER
+}
+
+type HolidayValue {
+  value: Holiday!
+  label: String!
+}
+
+type Lifestyle {
+  id: ID!
+  name: String!
+  iconUrl: String!
+}
+
+input LikeUserInput {
+  userId: ID!
+}
+
+enum Living {
+  ALONE
+  WITH_FRIENDS
+  WITH_PETS
+  WITH_PARENTS
+  OTHER
+}
+
+type LivingValue {
+  value: Living!
+  label: String!
+}
+
+type Me {
+  id: ID!
+  status: Status!
+  user: User!
+  membership: Membership
+  ekyc: Ekyc
+  likingUsers(page: Int, limit: Int): [UserLike!]!
+  likedUsers(page: Int, limit: Int): [UserLike!]!
+  footprintingUsers(page: Int, limit: Int): [UserFootprint!]!
+  footprintedUsers(page: Int, limit: Int): [UserFootprint!]!
+  chatRooms(page: Int, limit: Int): [ChatRoom!]!
+  notifications(page: Int, limit: Int): [UserRelation!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Membership {
+  effectUntil: DateTime!
+  isEffective: Boolean!
+}
+
 type MutationRoot {
   preSignUpload(input: PreSignUploadInput!): PreSignUploadPayload!
-  userCreate(input: UserCreateInput!): Me!
-  userUpdate(input: UserUpdateInput!): Me!
+  userCreate: Me!
+  userDetailUpdate(input: UpdateUserDetailInput!): Me!
+  userLike(input: LikeUserInput!): BoolPayload!
+  userFootprint(input: FootprintUserInput!): BoolPayload!
+  userDeviceTokenRegistration(input: RegisterDeviceTokenInput!): BoolPayload!
   userDelete: BoolPayload!
+  appstoreSubscriptionTransactionSync(input: AppstoreSubscriptionTransactionSyncInput!): BoolPayload!
+  ekycStart(input: StartEKYCInput!): Me!
+}
+
+type Notification {
+  id: ID!
+  title: String!
+  text: String!
+  imageUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum Occupation {
+  LISTED_COMPANY
+  FINANCE
+  CIVIL_SERVANT
+}
+
+type OccupationValue {
+  value: Occupation!
+  label: String!
 }
 
 input PreSignUploadInput {
@@ -70,25 +229,184 @@ type PreSignUploadPayload {
   url: String!
 }
 
+enum Prefecture {
+  HOKKAIDO
+  AOMORI
+  IWATE
+  MIYAGI
+  AKITA
+  YAMAGATA
+  FUKUSHIMA
+  IBARAKI
+  TOCHIGI
+  GUNMA
+  SAITAMA
+  CHIBA
+  TOKYO
+  KANAGAWA
+  NIIGATA
+  TOYAMA
+  ISHIKAWA
+  FUKUI
+  YAMANASHI
+  NAGANO
+  GIFU
+  SHIZUOKA
+  AICHI
+  MIE
+  SHIGA
+  KYOTO
+  OSAKA
+  HYOGO
+  NARA
+  WAKAYAMA
+  TOTTORI
+  SHIMANE
+  OKAYAMA
+  HIROSHIMA
+  YAMAGUCHI
+  TOKUSHIMA
+  KAGAWA
+  EHIME
+  KOCHI
+  FUKUOKA
+  SAGA
+  NAGASAKI
+  KUMAMOTO
+  OITA
+  MIYAZAKI
+  KAGOSHIMA
+  OKINAWA
+}
+
+type PrefectureValue {
+  value: Prefecture!
+  label: String!
+}
+
 type QueryRoot {
-  health: String!
   preSignDownload(key: String!): String!
   me: Me!
-  users: [User!]!
+  users(page: Int, limit: Int, prefecture: Prefecture, ageFrom: Int, ageTo: Int): [User!]!
   user(id: ID!): User!
+  hobbies: [Hobby!]!
+  lifestyles: [Lifestyle!]!
+  values: [Value!]!
+  prefectures: [PrefectureValue!]!
+  genders: [GenderValue!]!
+  occupations: [OccupationValue!]!
+  holidays: [HolidayValue!]!
+  livings: [LivingValue!]!
+  bodyShapes: [BodyShapeValue!]!
+  smokings: [SmokingValue!]!
+  annualIncomes: [AnnualIncomeValue!]!
+  academicBackgrounds: [AcademicBackgroundValue!]!
+}
+
+input RegisterDeviceTokenInput {
+  token: String!
+}
+
+enum Smoking {
+  NOT_SMOKING
+  SMOKING
+  E_SMOKING
+  NOT_IN_FRONT_OF_SMOKER
+  QUIT_IF_UNCOMFORTABLE
+  OCCASIONALLY_SMOKING
+}
+
+type SmokingValue {
+  value: Smoking!
+  label: String!
+}
+
+input StartEKYCInput {
+  documentKey: String!
+}
+
+enum Status {
+  CREATED
+  REVIEW
+  APPROVED
+  REJECTED
+}
+
+input UpdateUserDetailInput {
+  displayName: String!
+  birthDate: Date!
+  height: Float!
+  introduction: String!
+  prefecture: Prefecture!
+  gender: Gender!
+  occupation: Occupation!
+  holiday: Holiday!
+  living: Living!
+  bodyShape: BodyShape!
+  smoking: Smoking!
+  annualIncome: AnnualIncome!
+  academicBackground: AcademicBackground!
+  hobbyIds: [ID!]!
+  lifestyleIds: [ID!]!
+  valueIds: [ID!]!
+  imageKeys: [String!]!
 }
 
 type User {
   id: ID!
-  name: String!
+  isDeleted: Boolean!
+  detail: UserDetail
+  likingUserCount: Int!
+  likedUserCount: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
-input UserCreateInput {
-  name: String!
+type UserDetail {
+  displayName: String!
+  birthDate: Date!
+  height: Float!
+  introduction: String!
+  prefecture: PrefectureValue!
+  gender: GenderValue!
+  occupation: OccupationValue!
+  holiday: HolidayValue!
+  living: LivingValue!
+  bodyShape: BodyShapeValue!
+  smoking: SmokingValue!
+  annualIncome: AnnualIncomeValue!
+  academicBackground: AcademicBackgroundValue!
+  hobbies: [Hobby!]!
+  lifestyles: [Lifestyle!]!
+  values: [Value!]!
+  photos: [UserPhoto!]!
 }
 
-input UserUpdateInput {
+type UserFootprint {
+  userFrom: User!
+  userTo: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserLike {
+  userFrom: User!
+  userTo: User!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserPhoto {
+  imageUrl: String!
+}
+
+type UserRelation {
+  user: User!
+  notification: Notification!
+}
+
+type Value {
+  id: ID!
   name: String!
+  iconUrl: String!
 }

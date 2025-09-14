@@ -23,7 +23,7 @@
   "schemaDownload": {
     "downloadMethod": {
       "introspection": {
-        "endpointURL": "https://sample.com/graphql",
+        "endpointURL": "https://sample.com/api/graphql",
         "httpMethod": {
           "POST": {}
         },

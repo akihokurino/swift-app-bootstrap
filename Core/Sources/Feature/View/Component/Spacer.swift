@@ -25,21 +25,9 @@ struct Spacer4: View {
     }
 }
 
-struct Spacer6: View {
-    var body: some View {
-        Spacer().frame(width: 6, height: 6)
-    }
-}
-
 struct Spacer8: View {
     var body: some View {
         Spacer().frame(width: 8, height: 8)
-    }
-}
-
-struct Spacer10: View {
-    var body: some View {
-        Spacer().frame(width: 10, height: 10)
     }
 }
 
@@ -67,12 +55,6 @@ struct Spacer24: View {
     }
 }
 
-struct Spacer30: View {
-    var body: some View {
-        Spacer().frame(width: 30, height: 30)
-    }
-}
-
 struct Spacer32: View {
     var body: some View {
         Spacer().frame(width: 32, height: 32)
@@ -85,15 +67,9 @@ struct Spacer40: View {
     }
 }
 
-struct Spacer46: View {
+struct Spacer48: View {
     var body: some View {
-        Spacer().frame(width: 46, height: 46)
-    }
-}
-
-struct Spacer50: View {
-    var body: some View {
-        Spacer().frame(width: 50, height: 50)
+        Spacer().frame(width: 48, height: 48)
     }
 }
 

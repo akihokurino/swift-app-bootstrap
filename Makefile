@@ -1,10 +1,8 @@
 MAKEFLAGS=--no-builtin-rules --no-builtin-variables --always-make
 ROOT := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
-apollo-fetch-schema:
-	./apollo-ios-cli fetch-schema
-
 apollo-generate:
+	./apollo-ios-cli fetch-schema
 	./apollo-ios-cli generate
 
 config-generate:
